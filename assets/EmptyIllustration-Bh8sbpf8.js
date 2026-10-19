@@ -1,0 +1,1 @@
+import{_ as o,m as a,b as e,d as s}from"./index-CaSuNSLv.js";const c={class:"ill"},r={__name:"EmptyIllustration",props:{type:String},setup(l){return(p,t)=>(a(),e("div",c,[...t[0]||(t[0]=[s("div",{class:"ghost-box"},[s("div",{class:"ghost"},"◕‿◕"),s("div",{class:"box"},[s("span",{class:"q"},"?")])],-1)])]))}},_=o(r,[["__scopeId","data-v-62ca3d8b"]]);export{_ as E};

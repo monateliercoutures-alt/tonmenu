@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
-  { path: '/', redirect: '/accueil' },
-  { path: '/accueil-vitrine', component: () => import('../views/SiteVitrine.vue'), meta: { layout: 'site' } },
+  { path: '/', component: () => import('../views/SiteVitrine.vue'), meta: { layout: 'site' } },
+  { path: '/accueil-vitrine', redirect: '/' },
 
   // App main tabs
   { path: '/accueil', component: () => import('../views/Accueil.vue'), meta: { layout: 'app', tab: 'accueil' } },
@@ -40,7 +40,7 @@ const router = createRouter({
   }
 })
 
-// Device mode guard: mobile should not see vitrine
+// Device mode guard: mobile → /accueil, desktop → / (vitrine)
 router.beforeEach((to, from, next) => {
   const w = window.innerWidth
   const isCoarse = window.matchMedia('(pointer: coarse)').matches
@@ -48,11 +48,7 @@ router.beforeEach((to, from, next) => {
   const isIpad = navigator.userAgent.includes('Macintosh') && navigator.maxTouchPoints > 1
   const isApp = w < 1024 || isCoarse || isStandalone || isIpad
 
-  if (isApp && to.path === '/accueil-vitrine') return next('/accueil')
-  if (!isApp && to.path === '/accueil') {
-    // On desktop, keep /accueil accessible but optionally show vitrine at /
-    // No forced redirect to avoid trapping devs resizing
-  }
+  if (isApp && to.path === '/') return next('/accueil')
   next()
 })
 

@@ -1,10 +1,19 @@
 <template>
   <section class="strip">
-    <img v-for="p in photos" :key="p" :src="p" loading="lazy" alt="" />
+    <img v-for="(p,i) in photos" :key="i" :src="p" loading="lazy" alt="" />
   </section>
 </template>
 <script setup>
-const photos=['/extracted/saveurs/plats-en-sauce.png','/extracted/saveurs/poisson-crevettes.png','/extracted/saveurs/attieke-poisson.png','/extracted/saveurs/riz-poisson.png','/extracted/saveurs/burgers-genereux.png','/extracted/saveurs/pizzas-gourmandes.png','/extracted/saveurs/poulet-croustillant.png','/extracted/saveurs/croques-dores.png']
+const photos=[
+  '/thumbs/strip-0.png',
+  '/thumbs/strip-1.png',
+  '/thumbs/strip-2.png',
+  '/thumbs/strip-3.png',
+  '/thumbs/strip-4.png',
+  '/thumbs/strip-5.png',
+  '/thumbs/strip-6.png',
+  '/thumbs/strip-7.png'
+]
 </script>
 <style scoped>
 .strip{ display:grid; grid-template-columns:repeat(8,1fr); gap:6px; padding:16px 24px; max-width:1220px; margin:0 auto; background:#fff; }

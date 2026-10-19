@@ -2,8 +2,8 @@
   <section class="wrap">
     <div class="grid">
       <div class="visual">
-        <div class="main"><img src="/thumbs/saveur-1.png" alt="Poisson et crevettes" loading="lazy" /></div>
-        <div class="mini"><img src="/extracted/banners/banner-0.png" alt="Burger" loading="lazy" /></div>
+        <div class="main"><img src="/extracted/brand-main.png" alt="Poisson et crevettes en sauce" loading="lazy" /></div>
+        <div class="mini"><img src="/extracted/brand-mini.png" alt="Burger" loading="lazy" /></div>
         <div class="sticker">ICI, ON AIME<br><b>bien manger.</b></div>
       </div>
       <div class="copy">

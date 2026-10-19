@@ -20,40 +20,40 @@
     </section>
 
     <!-- CATEGORIES -->
-    <section class="section">
+    <section id="cuisines" class="section">
       <div class="section-head">
         <span class="eyebrow">CHAQUE ENVIE A SON MENU</span>
         <h2>Qu'est-ce qui vous fait envie ?</h2>
       </div>
       <div class="cats-head">
-        <button class="pill-red"><Utensils :size="14"/> Toutes les cuisines <span class="count">0</span></button>
+        <button class="pill-red" :class="{ active: activeCuisine==='all' }" @click="activeCuisine='all'"><Utensils :size="14"/> Toutes les cuisines <span class="count">{{ cuisines.length }}</span></button>
         <span class="count-label">10 catégories de restauration</span>
       </div>
       <div class="cat-grid">
-        <div v-for="c in cuisines" :key="c.title" class="cat-card">
-          <div class="cat-img"><img :src="c.img" :alt="c.title" v-if="c.img"/><span v-else class="cat-icon"><component :is="c.icon" :size="22"/></span></div>
+        <button v-for="c in filteredCuisines" :key="c.title" class="cat-card" @click="filterByCuisine(c)" :class="{ selected: activeCuisine===c.title }">
+          <div class="cat-img"><img :src="c.img" :alt="c.title" v-if="c.img" loading="lazy"/><span v-else class="cat-icon"><component :is="c.icon" :size="24"/></span></div>
           <h3>{{ c.title }}</h3>
           <p>{{ c.desc }}</p>
           <span class="cat-count">0 restaurants</span>
-        </div>
+        </button>
       </div>
     </section>
 
     <!-- 3 BANNERS -->
     <section class="banners">
-      <div class="banner yellow">
-        <div class="b-text"><small>POUR LES GRANDES FAIMS</small><h3>Un burger.<br>Et du bonheur.</h3><a>Explorer <ArrowUpRight :size="12"/></a></div>
-        <img src="https://images.unsplash.com/photo-1568909344668-6f14a07b56a0?w=500&q=80&auto=format&fit=crop" />
-      </div>
-      <div class="banner black">
-        <div class="b-text"><small>LE GOÛT DE CHEZ NOUS</small><h3>Attiéké & poisson.<br>Tout simplement<br>bon.</h3><a>Explorer <ArrowUpRight :size="12"/></a></div>
-        <img src="https://images.unsplash.com/photo-1547592180-85f173990554?w=500&q=80&auto=format&fit=crop" />
+      <button class="banner yellow" @click="$router.push('/accueil?cat=fastfood')">
+        <div class="b-text"><small>POUR LES GRANDES FAIMS</small><h3>Un burger.<br>Et du bonheur.</h3><span>Explorer <ArrowUpRight :size="12"/></span></div>
+        <img src="https://images.unsplash.com/photo-1568909344668-6f14a07b56a0?w=500&q=80&auto=format&fit=crop" loading="lazy" />
+      </button>
+      <button class="banner black" @click="$router.push('/accueil?cat=attieke')">
+        <div class="b-text"><small>LE GOÛT DE CHEZ NOUS</small><h3>Attiéké & poisson.<br>Tout simplement<br>bon.</h3><span>Explorer <ArrowUpRight :size="12"/></span></div>
+        <img src="https://images.unsplash.com/photo-1547592180-85f173990554?w=500&q=80&auto=format&fit=crop" loading="lazy" />
         <span class="badge-float">ÇA SENT<br>BON !</span>
-      </div>
-      <div class="banner red">
-        <div class="b-text"><small>LES CLASSIQUES QU'ON AIME</small><h3>Nos plats en sauce.<br>Du goût<br>à partager.</h3><a>Explorer <ArrowUpRight :size="12"/></a></div>
-        <img src="https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&q=80&auto=format&fit=crop" />
-      </div>
+      </button>
+      <button class="banner red" @click="$router.push('/accueil?cat=sauce')">
+        <div class="b-text"><small>LES CLASSIQUES QU'ON AIME</small><h3>Nos plats en sauce.<br>Du goût<br>à partager.</h3><span>Explorer <ArrowUpRight :size="12"/></span></div>
+        <img src="https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=500&q=80&auto=format&fit=crop" loading="lazy" />
+      </button>
     </section>
 
     <!-- PROCHAINES DECOUVERTES -->
@@ -64,12 +64,24 @@
         <p class="sub">De vraies cuisines, tout près de chez vous.</p>
       </div>
       <div class="discover-head">
-        <span class="pill-light">Tous les restaurants <span>0</span></span>
-        <button class="sort">⟡ Recommandés ▾</button>
+        <span class="pill-light">Tous les restaurants <span>{{ totalRestaurants }}</span></span>
+        <div class="sort-wrap" ref="sortRef">
+          <button class="sort" @click="showSort=!showSort" :aria-expanded="showSort" aria-haspopup="listbox">
+            <SlidersHorizontal :size="12"/> {{ sortLabel }} <ChevronDown :size="12" :class="{ rot: showSort }"/>
+          </button>
+          <div v-if="showSort" class="sort-dropdown" role="listbox">
+            <button v-for="o in sortOptions" :key="o.value" role="option" :class="{ active: sortBy===o.value }" @click="sortBy=o.value; showSort=false">{{ o.label }}</button>
+          </div>
+        </div>
       </div>
-      <div class="discover-card">
+
+      <div class="resto-grid" v-if="sortedRestaurants.length">
+        <RestaurantCard v-for="r in sortedRestaurants" :key="r.id" :r="r" :isFav="app.isFav(r.id)" @open="$router.push(`/restaurant/${r.id}`)" @fav="app.toggleFav(r.id)" />
+      </div>
+
+      <div v-else class="discover-card">
         <div class="discover-img">
-          <img src="https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&q=80&auto=format&fit=crop" />
+          <img src="https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&q=80&auto=format&fit=crop" loading="lazy" />
           <span class="soon">BIENTÔT<br>À TABLE !</span>
         </div>
         <div class="discover-text">
@@ -79,6 +91,7 @@
           <router-link to="/pro" class="btn-red">Inscrire mon restaurant <ArrowUpRight :size="14"/></router-link>
         </div>
       </div>
+      <p v-if="!sortedRestaurants.length" class="hint">Tri actuel: <b>{{ sortLabel }}</b> — les restaurants apparaîtront dès validation.</p>
     </section>
 
     <!-- SAVEURS -->
@@ -89,12 +102,12 @@
         <p class="sub">Des inspirations à retrouver selon les menus de nos partenaires.</p>
       </div>
       <div class="saveurs-grid">
-        <div v-for="s in saveurs" :key="s.title" class="saveur">
-          <div class="saveur-img"><img :src="s.img" :alt="s.title"/></div>
+        <button v-for="s in saveurs" :key="s.title" class="saveur" @click="$router.push('/accueil')">
+          <div class="saveur-img"><img :src="s.img" :alt="s.title" loading="lazy"/></div>
           <small>Cuisine locale</small>
           <h4>{{ s.title }}</h4>
-          <a>Explorer les restaurants <ArrowRight :size="12"/></a>
-        </div>
+          <span>Explorer les restaurants <ArrowRight :size="12"/></span>
+        </button>
       </div>
       <p class="legal">Photos d'inspiration. Les plats disponibles sont ceux des menus partenaires. Les marques visibles ne constituent pas une affiliation.</p>
     </section>
@@ -107,11 +120,11 @@
     </div>
 
     <!-- BONNES CUISINES -->
-    <section class="section">
+    <section id="esprit" class="section">
       <div class="quartier">
         <div class="q-media">
-          <img class="main" src="https://images.unsplash.com/photo-1547592180-85f173990554?w=700&q=80&auto=format&fit=crop" />
-          <img class="mini" src="https://images.unsplash.com/photo-1568909344668-6f14a07b56a0?w=300&q=80&auto=format&fit=crop" />
+          <img class="main" src="https://images.unsplash.com/photo-1547592180-85f173990554?w=700&q=80&auto=format&fit=crop" loading="lazy" />
+          <img class="mini" src="https://images.unsplash.com/photo-1568909344668-6f14a07b56a0?w=300&q=80&auto=format&fit=crop" loading="lazy" />
           <div class="q-badge">ICI, ON AIME<br><b>bien manger.</b></div>
         </div>
         <div class="q-text">
@@ -122,7 +135,7 @@
           <router-link to="/accueil" class="btn-red">Trouver ma prochaine adresse <ArrowRight :size="14"/></router-link>
         </div>
       </div>
-      <div class="features">
+      <div id="marche" class="features">
         <div><span class="f-icon">🏪</span><h5>Une cuisine qui vous plaît</h5><p>Découvrez les restaurants<br>et leurs spécialités.</p></div>
         <div><span class="f-icon">🍲</span><h5>Un menu à votre goût</h5><p>Choisissez vos plats<br>et composez votre panier.</p></div>
         <div><span class="f-icon">💳</span><h5>Vos habitudes de paiement</h5><p>Choisissez votre opérateur.<br>Mobile Money simple pour le moment.</p></div>
@@ -137,17 +150,17 @@
           <small>L'APPÉTIT N'ATTEND PAS.</small>
           <h2>Votre quartier.<br>Votre menu.<br><span>Dans votre poche.</span></h2>
           <p>Gardez TonMenu sur votre écran d'accueil.<br>Pas de téléchargement dans un store, juste un clic.</p>
-          <button class="btn-dark"><Download :size="14"/> Installer TonMenu</button>
+          <button class="btn-dark" @click="installPWA"><Download :size="14"/> Installer TonMenu</button>
           <small class="pwa">PWA · Android, iPhone et ordinateur</small>
         </div>
         <div class="app-media">
           <div class="phone">
             <div class="phone-head">TonMenu.</div>
-            <img src="https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=400&q=80&auto=format&fit=crop" />
+            <img src="https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=400&q=80&auto=format&fit=crop" loading="lazy" />
             <div class="phone-foot">BON APPÉTIT, LE QUARTIER.</div>
           </div>
           <div class="phone-behind">
-            <img src="https://images.unsplash.com/photo-1628840042765-356cda07504e?w=400&q=80&auto=format&fit=crop" />
+            <img src="https://images.unsplash.com/photo-1628840042765-356cda07504e?w=400&q=80&auto=format&fit=crop" loading="lazy" />
           </div>
           <div class="app-badge">TOUJOURS<br><b>à portée<br>de main.</b></div>
         </div>
@@ -165,7 +178,7 @@
         <router-link to="/pro" class="btn-red">Devenir partenaire <ArrowUpRight :size="14"/></router-link>
       </div>
       <div class="partner-strip">
-        <img v-for="i in 8" :key="i" :src="partnerImgs[i-1]" />
+        <img v-for="i in 8" :key="i" :src="partnerImgs[i-1]" loading="lazy" />
       </div>
     </section>
 
@@ -173,9 +186,17 @@
 </template>
 
 <script setup>
-import { ArrowRight, ArrowUpRight, Utensils, Download } from 'lucide-vue-next'
-import { Store, ChefHat, Sandwich } from 'lucide-vue-next'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ArrowRight, ArrowUpRight, Utensils, Download, SlidersHorizontal, ChevronDown } from 'lucide-vue-next'
+import { Sandwich, ChefHat } from 'lucide-vue-next'
+import RestaurantCard from '../components/RestaurantCard.vue'
+import { restaurants } from '../data/mockData.js'
+import { useAppStore } from '../stores/app.js'
 
+const app = useAppStore()
+
+// Categories filtering
+const activeCuisine = ref('all')
 const cuisines = [
   { title:'Maquis', desc:"Restaurants ivoiriens traditionnels, souvent en plein air : kedjenou, sauce feuille, sauce graine.", img:'https://images.unsplash.com/photo-1547592180-85f173990554?w=300&q=80&auto=format&fit=crop' },
   { title:'Grillades / Rôtisserie', desc:"Poulet braisé, poisson grillé et brochettes, en kiosque ou à l'allocodrome.", img:'https://images.unsplash.com/photo-1529193591184-b1d58069c7bb?w=300&q=80&auto=format&fit=crop' },
@@ -188,6 +209,40 @@ const cuisines = [
   { title:'Cuisine française / européenne', desc:"Bistrots, brasseries et plats des cuisines française et européenne.", img:null, icon: ChefHat },
   { title:'Pâtisserie / Snacks / Café', desc:"Viennoiseries, gâteaux, snacks et boissons chaudes pour toutes les pauses.", img:'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300&q=80&auto=format&fit=crop' },
 ]
+const filteredCuisines = computed(()=> cuisines)
+function filterByCuisine(c){
+  activeCuisine.value = c.title
+  document.getElementById('cuisines')?.scrollIntoView({ behavior:'smooth', block:'start' })
+}
+
+// Sort / filter for découvertes
+const sortBy = ref('recommande')
+const showSort = ref(false)
+const sortRef = ref(null)
+const sortOptions = [
+  { value:'recommande', label:'Recommandés' },
+  { value:'note', label:'Les mieux notés' },
+  { value:'rapide', label:'Plus rapides' },
+  { value:'gratuit', label:'Livraison gratuite' },
+]
+const sortLabel = computed(()=> sortOptions.find(o=> o.value===sortBy.value)?.label || 'Recommandés')
+
+const totalRestaurants = computed(()=> restaurants.length)
+const sortedRestaurants = computed(()=> {
+  // Mock: show restaurants only if not default empty? For demo, show 0 to keep "bientôt" card, but when user changes filter, show some
+  if(sortBy.value==='recommande') return []
+  let list = [...restaurants]
+  if(sortBy.value==='note') list = list.sort((a,b)=> b.rating - a.rating)
+  if(sortBy.value==='rapide') list = list.sort((a,b)=> parseInt(a.deliveryTime) - parseInt(b.deliveryTime))
+  if(sortBy.value==='gratuit') list = list.filter(r=> r.deliveryFree)
+  return list.slice(0,6)
+})
+
+function onClickOutside(e){
+  if(sortRef.value && !sortRef.value.contains(e.target)) showSort.value=false
+}
+onMounted(()=> document.addEventListener('click', onClickOutside))
+onUnmounted(()=> document.removeEventListener('click', onClickOutside))
 
 const saveurs = [
   { title:'Plats en sauce', img:'https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=400&q=80&auto=format&fit=crop' },
@@ -210,6 +265,11 @@ const partnerImgs = [
   'https://images.unsplash.com/photo-1513104890138-7c749659a591?w=300&q=80&auto=format&fit=crop',
   'https://images.unsplash.com/photo-1521390188846-e2a3a97453a0?w=300&q=80&auto=format&fit=crop',
 ]
+
+function installPWA(){
+  // A2HS prompt if available, else scroll
+  alert('Pour installer: menu navigateur → Installer l’app / Ajouter à l’écran d’accueil (PWA prête, start_url /accueil)')
+}
 </script>
 
 <style scoped>
@@ -239,12 +299,15 @@ const partnerImgs = [
 .eyebrow{ color:#ec3d2e; font-size:9px; letter-spacing:1.2px; font-weight:700; }
 .section-head h2{ font-size:26px; font-weight:800; margin:6px 0 4px; }
 .sub{ color:#777; font-size:13px; }
-.cats-head{ display:flex; justify-content:space-between; align-items:center; margin:16px 0; }
-.pill-red{ display:inline-flex; align-items:center; gap:6px; background:#ec3d2e; color:#fff; border:none; padding:8px 14px; border-radius:999px; font-weight:700; font-size:12px; }
+.cats-head{ display:flex; justify-content:space-between; align-items:center; margin:16px 0; flex-wrap:wrap; gap:10px; }
+.pill-red{ display:inline-flex; align-items:center; gap:6px; background:#ec3d2e; color:#fff; border:none; padding:8px 14px; border-radius:999px; font-weight:700; font-size:12px; cursor:pointer; }
+.pill-red.active{ background:#111; }
 .pill-red .count{ background:#fff; color:#ec3d2e; width:16px; height:16px; border-radius:50%; display:grid; place-items:center; font-size:10px; }
 .count-label{ font-size:11px; color:#999; }
 .cat-grid{ display:grid; grid-template-columns: repeat(5, 1fr); gap:14px; }
-.cat-card{ background:#FFFBF5; border:1px solid #F0E6D6; border-radius:14px; padding:16px 12px; text-align:center; }
+.cat-card{ background:#FFFBF5; border:1px solid #F0E6D6; border-radius:14px; padding:16px 12px; text-align:center; cursor:pointer; transition:.15s; }
+.cat-card:hover{ transform:translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.06); }
+.cat-card.selected{ outline:2px solid #ec3d2e; outline-offset:2px; }
 .cat-img{ width:84px; height:84px; border-radius:50%; margin:0 auto 10px; overflow:hidden; background:#fff; border:3px solid #fff; box-shadow:0 2px 10px rgba(0,0,0,.06); display:grid; place-items:center; }
 .cat-img img{ width:100%; height:100%; object-fit:cover; }
 .cat-icon{ color:#8A9A7B; }
@@ -254,7 +317,7 @@ const partnerImgs = [
 
 /* BANNERS */
 .banners{ max-width:1280px; margin:0 auto; padding:0 20px 40px; display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
-.banner{ border-radius:14px; overflow:hidden; display:grid; grid-template-columns:1fr 1fr; position:relative; min-height:160px; }
+.banner{ border-radius:14px; overflow:hidden; display:grid; grid-template-columns:1fr 1fr; position:relative; min-height:160px; border:none; cursor:pointer; text-align:left; }
 .banner img{ width:100%; height:100%; object-fit:cover; }
 .banner.yellow{ background:#FFD600; color:#111; }
 .banner.black{ background:#111; color:#fff; }
@@ -262,14 +325,21 @@ const partnerImgs = [
 .b-text{ padding:18px; display:flex; flex-direction:column; justify-content:center; }
 .b-text small{ font-size:9px; letter-spacing:.6px; opacity:.7; }
 .b-text h3{ font-size:18px; font-weight:800; line-height:1.1; margin:6px 0 10px; }
-.b-text a{ font-size:11px; font-weight:700; text-decoration:underline; text-underline-offset:3px; display:inline-flex; gap:4px; align-items:center; }
+.b-text span{ font-size:11px; font-weight:700; text-decoration:underline; text-underline-offset:3px; display:inline-flex; gap:4px; align-items:center; }
 .badge-float{ position:absolute; right:36%; top:12%; background:#FFD600; color:#111; font-size:10px; font-weight:800; width:56px; height:56px; border-radius:50%; display:grid; place-items:center; text-align:center; transform:rotate(8deg); }
 
 /* DISCOVER */
-.discover-head{ display:flex; justify-content:space-between; align-items:center; margin:16px 0; }
+.discover-head{ display:flex; justify-content:space-between; align-items:center; margin:16px 0; flex-wrap:wrap; gap:10px; }
 .pill-light{ display:inline-flex; gap:6px; align-items:center; background:#fff; border:1px solid #e5e5e5; padding:8px 12px; border-radius:999px; font-weight:700; font-size:12px; }
 .pill-light span{ background:#F5EFE6; width:16px; height:16px; border-radius:50%; display:grid; place-items:center; font-size:10px; }
-.sort{ background:#fff; border:1px solid #e5e5e5; padding:8px 12px; border-radius:999px; font-size:12px; }
+.sort-wrap{ position:relative; }
+.sort{ background:#fff; border:1px solid #e5e5e5; padding:8px 12px; border-radius:999px; font-size:12px; font-weight:600; display:inline-flex; gap:6px; align-items:center; cursor:pointer; }
+.sort .rot{ transform:rotate(180deg); }
+.sort-dropdown{ position:absolute; right:0; top:40px; background:#fff; border:1px solid #eee; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.08); padding:6px; min-width:160px; display:flex; flex-direction:column; z-index:10; }
+.sort-dropdown button{ text-align:left; padding:8px 10px; border:none; background:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; }
+.sort-dropdown button.active{ background:#FFF6CC; }
+.sort-dropdown button:hover{ background:#F5F5F5; }
+.resto-grid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-top:12px; }
 .discover-card{ display:grid; grid-template-columns:280px 1fr; gap:24px; background:#fff; border:1px dashed #e5dcc8; border-radius:16px; padding:20px; align-items:center; }
 .discover-img{ position:relative; }
 .discover-img img{ width:100%; height:200px; object-fit:cover; border-radius:50% 50% 12px 12px / 60% 60% 20% 20%; }
@@ -277,16 +347,17 @@ const partnerImgs = [
 .discover-text small{ color:#ec3d2e; font-size:9px; letter-spacing:.8px; font-weight:700; }
 .discover-text h3{ font-size:20px; font-weight:800; margin:6px 0; }
 .discover-text p{ color:#777; font-size:13px; line-height:1.4; }
-.btn-red{ display:inline-flex; align-items:center; gap:6px; background:#ec3d2e; color:#fff; padding:10px 16px; border-radius:999px; font-weight:700; font-size:13px; text-decoration:none; border:none; margin-top:10px; }
+.btn-red{ display:inline-flex; align-items:center; gap:6px; background:#ec3d2e; color:#fff; padding:10px 16px; border-radius:999px; font-weight:700; font-size:13px; text-decoration:none; border:none; margin-top:10px; cursor:pointer; }
+.hint{ text-align:center; font-size:11px; color:#777; margin-top:10px; }
 
 /* SAVEURS */
 .saveurs-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap:16px; margin-top:16px; }
-.saveur{ text-align:center; }
+.saveur{ text-align:center; background:none; border:none; cursor:pointer; }
 .saveur-img{ background:#FAF6F0; border-radius:14px; padding:8px; height:180px; display:grid; place-items:center; overflow:hidden; }
 .saveur-img img{ width:100%; height:160px; object-fit:cover; border-radius:10px; }
 .saveur small{ color:#999; font-size:10px; margin-top:8px; display:block; }
 .saveur h4{ font-size:13px; font-weight:800; margin:4px 0; }
-.saveur a{ font-size:11px; color:#ec3d2e; text-decoration:none; font-weight:600; display:inline-flex; gap:4px; align-items:center; }
+.saveur span{ font-size:11px; color:#ec3d2e; text-decoration:none; font-weight:600; display:inline-flex; gap:4px; align-items:center; }
 .legal{ text-align:center; font-size:10px; color:#999; margin-top:16px; }
 
 /* YELLOW BAR */
@@ -314,7 +385,7 @@ const partnerImgs = [
 .app-text h2{ font-size:28px; font-weight:800; line-height:1.1; margin:8px 0; }
 .app-text h2 span{ color:#FFD600; }
 .app-text p{ font-size:13px; color:#ffcccc; }
-.btn-dark{ display:inline-flex; align-items:center; gap:6px; background:#111; color:#fff; border:none; padding:10px 16px; border-radius:999px; font-weight:700; font-size:12px; margin-top:10px; }
+.btn-dark{ display:inline-flex; align-items:center; gap:6px; background:#111; color:#fff; border:none; padding:10px 16px; border-radius:999px; font-weight:700; font-size:12px; margin-top:10px; cursor:pointer; }
 .pwa{ display:block; margin-top:8px; font-size:9px; opacity:.7; }
 .app-media{ position:relative; height:360px; }
 .phone{ position:absolute; right:80px; top:0; width:220px; height:360px; background:#fff; border-radius:32px; overflow:hidden; border:6px solid #111; box-shadow:0 12px 32px rgba(0,0,0,.3); z-index:2; }
@@ -344,6 +415,7 @@ const partnerImgs = [
   .quartier{ grid-template-columns:1fr; }
   .app-inner{ grid-template-columns:1fr; }
   .partner-strip{ grid-template-columns: repeat(4, 1fr); }
+  .resto-grid{ grid-template-columns:1fr 1fr; }
 }
 @media(max-width:640px){
   .hero-text{ padding:24px 16px; }
@@ -361,5 +433,6 @@ const partnerImgs = [
   .phone{ right:50%; transform:translateX(50%); width:200px; height:300px; }
   .phone-behind{ display:none; }
   .partner-inner{ flex-direction:column; text-align:center; }
+  .resto-grid{ grid-template-columns:1fr; }
 }
 </style>

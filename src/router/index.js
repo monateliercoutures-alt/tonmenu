@@ -40,16 +40,6 @@ const router = createRouter({
   }
 })
 
-// Device mode guard: mobile → /accueil, desktop → / (vitrine)
-router.beforeEach((to, from, next) => {
-  const w = window.innerWidth
-  const isCoarse = window.matchMedia('(pointer: coarse)').matches
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone
-  const isIpad = navigator.userAgent.includes('Macintosh') && navigator.maxTouchPoints > 1
-  const isApp = w < 1024 || isCoarse || isStandalone || isIpad
-
-  if (isApp && to.path === '/') return next('/accueil')
-  next()
-})
+// Plus de redirection mobile — la page d'accueil est responsive et visible partout
 
 export default router

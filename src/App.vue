@@ -20,16 +20,12 @@ const route = useRoute()
 const { mode } = useDeviceMode()
 
 const layout = computed(() => {
-  // Pro routes always use their own layout
   if (route.path.startsWith('/pro')) return 'div'
-  // Explicit meta
   if (route.meta.layout === 'site') return SiteLayout
   if (route.meta.layout === 'app') return AppLayout
-  // Device mode based
-  if (mode.value === 'site' && route.path === '/') return SiteLayout
-  // Restaurant, panier, checkout, suivi => no bottom nav but still app layout wrapper
   if (route.meta.hideBottomNav) return AppLayout
-  // Default: app vs site
+  // '/' est toujours SiteLayout (vitrine responsive)
+  if (route.path === '/') return SiteLayout
   return mode.value === 'site' ? SiteLayout : AppLayout
 })
 </script>

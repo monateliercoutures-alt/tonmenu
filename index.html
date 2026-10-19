@@ -14,22 +14,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <title>TonMenu — Le goût du quartier</title>
-  <script>
-    // Early device mode redirect to avoid vitrine flash on mobile/tablet
-    (function(){
-      try{
-        var w = window.innerWidth;
-        var isCoarse = window.matchMedia('(pointer: coarse)').matches;
-        var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-        var isIpad = navigator.userAgent.includes('Macintosh') && navigator.maxTouchPoints > 1;
-        var isApp = w < 1024 || isCoarse || isStandalone || isIpad;
-        var path = window.location.pathname;
-        if(isApp && (path === '/' || path === '/accueil-vitrine')){
-          window.location.replace('/accueil');
-        }
-      }catch(e){}
-    })();
-  </script>
 </head>
 <body>
   <div id="app"></div>

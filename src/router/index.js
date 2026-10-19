@@ -40,6 +40,13 @@ const router = createRouter({
   }
 })
 
-// Plus de redirection mobile — la page d'accueil est responsive et visible partout
+router.beforeEach((to)=>{
+  try{
+    const w=window.innerWidth;
+    const isCoarse=window.matchMedia('(pointer: coarse)').matches;
+    const isApp= w < 1024 || isCoarse || window.matchMedia('(display-mode: standalone)').matches;
+    if(isApp && to.path==='/') return '/accueil';
+  }catch(e){}
+})
 
 export default router

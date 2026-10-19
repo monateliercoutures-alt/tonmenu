@@ -7,10 +7,7 @@
         <button @click="go" aria-label="Rechercher">→</button>
       </label>
       <router-link to="/" class="logo" aria-label="TonMenu accueil">
-        <span class="picto" aria-hidden="true">
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="0" y="0" width="28" height="28" rx="7" fill="#EC3D2E"/><path d="M7 12c0 0 2.5 5.5 7 5.5S21 12 21 12" stroke="white" stroke-width="1.5" stroke-linecap="round"/><path d="M8.5 8.5c0-1 0.8-1.8 1.8-1.6M13 7c0-1.2 1-1.8 2-1.5M17.5 8.2c0-1 0.8-1.8 1.8-1.3" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity="0.95"/><ellipse cx="14" cy="17.8" rx="6.5" ry="1" fill="white" opacity="0.9"/></svg>
-        </span>
-        <span class="word"><em>Ton</em><b>Menu.</b></span>
+        <img src="/extracted/logo.png" alt="TonMenu" height="28" style="height:28px; display:block;" />
       </router-link>
       <div class="actions">
         <button class="addr" @click="app.showAddressSheet=true">
@@ -33,19 +30,15 @@ function go(){ if(q.value.trim()) router.push({path:'/accueil', query:{q:q.value
 </script>
 <style scoped>
 .header{ background:#fff; border-bottom:1px solid #E5E7EB; position:sticky; top:0; z-index:30; }
-.inner{ max-width:1220px; margin:0 auto; padding:18px 24px; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:16px; }
+.inner{ max-width:1220px; margin:0 auto; padding:16px 24px; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:16px; }
 .search{ display:flex; align-items:center; gap:8px; border-bottom:1px solid #E5E7EB; padding:8px 4px; width:300px; }
-.search input{ flex:1; border:none; outline:none; font-size:13px; background:transparent; }
+.search input{ flex:1; border:none; outline:none; font-size:12px; background:transparent; }
 .search input::placeholder{ color:#9CA3AF; }
 .search button{ border:none; background:none; color:#9CA3AF; cursor:pointer; font-size:14px; }
-.logo{ display:flex; align-items:center; gap:8px; text-decoration:none; justify-self:center; }
-.picto{ width:28px; height:28px; display:grid; place-items:center; }
-.word{ font-family:'Playfair Display', serif; font-size:20px; line-height:1; }
-.word em{ font-style:italic; font-weight:400; color:#111; }
-.word b{ font-style:italic; font-weight:700; color:#EC3D2E; }
+.logo{ display:flex; align-items:center; text-decoration:none; justify-self:center; }
 .actions{ display:flex; align-items:center; gap:10px; justify-self:end; }
 .addr{ display:flex; align-items:center; gap:8px; border:1px solid #E5E7EB; border-radius:999px; padding:6px 12px; background:#fff; cursor:pointer; }
-.addr small{ display:block; font-size:7.5px; letter-spacing:.7px; color:#9CA3AF; font-weight:700; }
+.addr small{ display:block; font-size:7px; letter-spacing:.7px; color:#9CA3AF; font-weight:700; }
 .addr strong{ font-size:11px; color:#111; }
 .ic{ width:36px; height:36px; border-radius:50%; border:1px solid #E5E7EB; background:#fff; display:grid; place-items:center; color:#111; cursor:pointer; position:relative; }
 .ic.cart{ border-color:#111; }
